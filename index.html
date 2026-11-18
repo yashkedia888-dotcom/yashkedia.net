@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yash Kedia — Portfolio</title>
+<meta name="description" content="Yash Kedia — creative marketing, branded content and media production. A house of rooms, one for each kind of work.">
+<link rel="preload" href="assets/fonts/Garet-Regular.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="css/style.css?v=1794995220">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body class="is-loading mode-gallery">
+
+<div id="loader" aria-hidden="true">
+  <p class="loader-line">Yash Kedia</p>
+  <div class="loader-bar"><span id="loader-pct">0%</span><i id="loader-fill"></i></div>
+</div>
+
+<header class="bar">
+  <a class="mark" href="#top" data-go="gallery" aria-label="Yash Kedia, start">Yash Kedia</a>
+  <nav class="links" aria-label="Sections">
+    <a href="#index" data-go="list">Index</a>
+    <a href="#info" data-go="list">Info</a>
+    <a href="#contact" data-go="list">Contact</a>
+  </nav>
+  <button class="sound-btn" id="sound-btn" type="button" aria-expanded="false" aria-controls="sound">Sound</button>
+  <div class="toggle" role="group" aria-label="View">
+    <button type="button" data-mode="gallery" aria-pressed="true">House</button>
+    <button type="button" data-mode="list" aria-pressed="false">Index</button>
+  </div>
+</header>
+
+<main id="gallery" aria-label="Walk-through house">
+  <canvas id="stage"></canvas>
+
+  <nav class="rooms" id="rooms" aria-label="Rooms"></nav>
+
+  <div class="hud" id="hud">
+    <p class="hud-kicker" id="hud-kicker">&nbsp;</p>
+    <p class="hud-title" id="hud-title">&nbsp;</p>
+    <p class="hud-meta" id="hud-meta">&nbsp;</p>
+    <button class="hud-open" id="hud-open" type="button" hidden>Open</button>
+  </div>
+
+  <p class="hint" id="hint">Scroll to walk. Drag to look around. Click a piece to open it.</p>
+  <div class="rail" aria-hidden="true"><i id="rail-fill"></i></div>
+</main>
+
+<div id="list">
+  <section class="hero" id="top">
+    <h1 class="hero-name">Yash Kedia</h1>
+    <p class="hero-line">Creative marketing, branded content and media production.</p>
+  </section>
+
+  <div class="filters" id="filters" role="search">
+    <div class="f-kinds" id="f-kinds" role="group" aria-label="Kind of work"></div>
+    <label class="f-search"><span>Search</span><input id="f-q" type="search" placeholder="Search" aria-label="Search the work" autocomplete="off" spellcheck="false"></label>
+    <div class="f-colours" id="f-colours" role="group" aria-label="Mostly this colour"></div>
+    <p class="f-meta"><span id="f-count"></span> <button type="button" id="f-clear" hidden>Clear</button></p>
+  </div>
+
+  <div id="index"></div>
+
+  <section class="info" id="info">
+    <h2>About</h2>
+    <div class="info-grid">
+      <figure class="info-portrait"><img src="assets/work/portrait.jpg" alt="Yash Kedia seated at a table outdoors" loading="lazy"></figure>
+      <div class="info-copy" id="about"></div>
+    </div>
+    <dl class="numbers" id="numbers"></dl>
+    <div class="influences">
+      <h3>Influences</h3>
+      <ul id="influences"></ul>
+    </div>
+    <table class="cv" id="cv"><caption>Experience</caption><tbody></tbody></table>
+  </section>
+
+  <footer class="end" id="contact">
+    <h2 class="end-title">Contact</h2>
+    <ul class="end-links" id="contact-links"></ul>
+    <p class="colophon">San Diego, California</p>
+  </footer>
+</div>
+
+<div id="viewer" hidden role="dialog" aria-modal="true" aria-label="Piece">
+  <button class="viewer-close" id="viewer-close" type="button">Close</button>
+  <div class="viewer-media" id="viewer-media"></div>
+  <aside class="viewer-cap">
+    <p id="cap-no"></p>
+    <h3 class="cap-title" id="cap-title"></h3>
+    <p class="cap-idea" id="cap-idea"></p>
+    <ul class="cap-tags" id="cap-tags"></ul>
+    <dl class="cap-dl" id="cap-dl"></dl>
+    <div class="viewer-nav">
+      <button type="button" id="viewer-prev" aria-label="Previous piece">&larr;</button>
+      <button type="button" id="viewer-next" aria-label="Next piece">&rarr;</button>
+    </div>
+  </aside>
+</div>
+
+<aside class="sound" id="sound" hidden aria-label="Music">
+  <header class="deck-head">
+    <p class="deck-kicker"><i class="deck-led" id="deck-led"></i><span id="deck-state">Paused</span></p>
+    <button type="button" id="sound-close" aria-label="Hide the player, keep it playing">Hide</button>
+  </header>
+  <p class="deck-name" id="deck-name"></p>
+  <div class="deck-screen"><div id="sound-frame"></div></div>
+  <div class="deck-readout">
+    <span class="deck-count" id="deck-count">— / —</span>
+    <span class="deck-title" id="deck-title">Side A</span>
+  </div>
+  <div class="deck-keys" id="deck-keys">
+    <button type="button" data-act="prev" aria-label="Previous track">&#9198;</button>
+    <button type="button" data-act="toggle" class="deck-play" id="deck-play" aria-label="Play">&#9654;</button>
+    <button type="button" data-act="next" aria-label="Next track">&#9197;</button>
+    <button type="button" data-act="shuffle" id="deck-shuffle" aria-pressed="false" aria-label="Shuffle">Shuffle</button>
+  </div>
+  <label class="deck-vol"><span>Vol</span><input id="deck-vol" type="range" min="0" max="100" value="70" aria-label="Volume"></label>
+  <div class="deck-also"><span>Or an album:</span><span id="sound-tabs"></span></div>
+</aside>
+
+<div class="grain" aria-hidden="true"></div>
+<script type="module" src="js/main.js?v=1794995220"></script>
+</body>
+</html>
