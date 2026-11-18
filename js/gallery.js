@@ -20,7 +20,7 @@ const KINDS = {
   // white stucco hall: barrel vault in relief, black and white marble, urns
   salon:       { ...BASE, h: 4.7, rise: 2.5, wall: '#ece7dc', ceil: 'vault', mould: 'white', floor: 'chequer', extras: 'urns', fog: '#efebe2', bench: 0x6e1f24 },
   // mint cabinet of mirrors with a dark painted ceiling
-  terminal:    { ...BASE, w: 10, h: 5.4, wall: '#b4cbb1', ceil: 'painted', gap: 'mirror', floor: 'darkparquet', rug: ['#2f4a3a', '#d9c9a3'], fog: '#d5dfd0', sky: ['#22383a', '#5d7f78'], bench: 0x2f4a3a },
+  terminal:    { ...BASE, w: 10, h: 5.4, wall: '#b4cbb1', ceil: 'painted', floor: 'darkparquet', rug: ['#2f4a3a', '#d9c9a3'], fog: '#d5dfd0', sky: ['#22383a', '#5d7f78'], bench: 0x2f4a3a },
   // a small pink drawing room: lower ceiling, a rug, a rosette
   living:      { ...BASE, w: 9.4, h: 4.6, wall: '#e2c4ba', ceil: 'rosette', rug: ['#8a4a4a', '#ecdcc8'], fog: '#eedfd8', bench: 0x8a4a4a },
   // walnut and amber: a dim panelled room lit by sconces, red carpet
@@ -177,10 +177,7 @@ export function createGallery({ canvas, chapters, works, portrait, showreel, onF
     const mine = works.map((work, index) => ({ work, index })).filter(({ work }) => work.ch === ch.id && work.house !== false);
     const left = [], right = [];
     const vids = mine.filter(({ work }) => work.type === 'video'), imgs = mine.filter(({ work }) => work.type !== 'video');
-    imgs.forEach((p, i) => (vids.length ? left : i % 2 ? right : left).push(p));
-    vids.forEach((p) => right.push(p));
-    while (left.length - right.length > 2) right.push(left.pop());
-    while (right.length - left.length > 2 && right[right.length - 1].work.type !== 'video') left.push(right.pop());
+    [...imgs, ...vids].forEach((p, i) => (i % 2 ? right : left).push(p));          // both walls carry the same number, so neither runs bare
     const slots = [];
     const run = (list, side) => {
       let c = -INTRO;
@@ -379,21 +376,30 @@ export function createGallery({ canvas, chapters, works, portrait, showreel, onF
       const top = H - 1.0, mcy = (1.32 + top) / 2, mh = top - 1.32;
       for (const side of [-1, 1]) {
         const cols = room.slots.filter((s) => s.side === side).map((s) => ({ c: s.dz, w: s.w + 1.0 }));
-        cols.unshift({ c: -INTRO / 2 + 0.2, w: INTRO - 1.7 });
-        const end = cols[cols.length - 1].c - cols[cols.length - 1].w / 2;
-        if (-len - end < -2.4) cols.push({ c: (end - len) / 2 - 0.2, w: Math.min(3.4, end + len - 1.6) });
+        // no panel is ever left empty: the one inside the door on the left carries the room's name
+        if (side === -1) cols.unshift({ c: -INTRO / 2 + 0.2, w: INTRO - 1.7, title: true });
         cols.forEach((col, i) => {
           const q = wallGroup(side, col.c);
           moulding(q, col.w, mh, 0, mcy, mould);
+          if (col.title) {
+            const tw = col.w - 0.5, th = tw * 0.5;
+            const tt = canvasTex(1024, 512, (c, w, h) => {
+              c.clearRect(0, 0, w, h); c.textAlign = 'center'; c.textBaseline = 'middle';
+              const ink = dim ? '#e2c88f' : '#6f5c35';
+              let px = 92; c.letterSpacing = '10px'; const name = ch.title.toUpperCase();
+              do { c.font = `500 ${px}px "Cinzel", serif`; px -= 4; } while (c.measureText(name).width > w - 80 && px > 30);
+              c.fillStyle = ink; c.fillText(name, w / 2, h * 0.4);
+              c.fillRect(w / 2 - 60, h * 0.58, 120, 2);
+              if (ch.style) { c.letterSpacing = '1px'; let q2 = 34; do { c.font = `${q2}px "Garet", sans-serif`; q2 -= 2; } while (c.measureText(ch.style).width > w - 80 && q2 > 18); c.globalAlpha = 0.85; c.fillText(ch.style, w / 2, h * 0.74); }
+            });
+            const tm = new THREE.Mesh(new THREE.PlaneGeometry(tw, th), bas(0xffffff, { map: tt, transparent: true })); tm.position.set(0, mcy, 0.012); q.add(tm);
+          }
           moulding(q, col.w, 0.5, 0, 0.66, trim, 0.035, 0.025);
           const nxt = cols[i + 1];
           const edge = col.c - col.w / 2, gapTo = nxt ? nxt.c + nxt.w / 2 : -len;
           const px = side * ((edge + gapTo) / 2 - col.c);             // local x of the gap centre (sign follows the wall's rotation)
-          if (edge - gapTo > 0.7 && K.gap === 'mirror') {            // a tall looking-glass between the pictures
-            const gw = Math.min(0.9, edge - gapTo - 0.4), gh = mh - 0.3;
-            const mr = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), bas(0xffffff, { map: mirrorMap })); mr.position.set(px, mcy, 0.02); q.add(mr);
-            moulding(q, gw + 0.08, gh + 0.08, px, mcy, gold, 0.06, 0.05);
-          } else if (edge - gapTo > 0.7 && K.gap === 'sconce') {     // a bracket of candles
+          if (!nxt) return;                                          // nothing after the last picture
+          if (edge - gapTo > 0.7 && K.gap === 'sconce') {     // a bracket of candles
             box(q, 0.1, 0.5, 0.06, gold, px, 2.5, 0.03); box(q, 0.5, 0.03, 0.03, gold, px, 2.42, 0.14);
             for (const o of [-0.22, 0.22]) { cyl(q, 0.016, 0.016, 0.2, lam(0xf6f0e2), px + o, 2.54, 0.14, 6); const f = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), bas(0xfff1cf, { fog: false })); f.position.set(px + o, 2.67, 0.14); q.add(f); }
             const hm = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 3.4), bas(0xffffff, { map: glow('255,196,120'), transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending })); hm.position.set(px, 2.7, 0.012); q.add(hm);

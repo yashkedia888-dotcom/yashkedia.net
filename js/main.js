@@ -1,4 +1,4 @@
-import { CHAPTERS, WORKS as ALL, PROFILE, INFLUENCES, SELECTION, ALSO, SOUND } from './data.js?v=1794995220';
+import { CHAPTERS, WORKS as ALL, PROFILE, INFLUENCES, SELECTION, ALSO, SOUND } from './data.js?v=1795001914';
 const WORKS = ALL;
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -244,8 +244,8 @@ function ensureGallery() {
   if (galleryReady) return galleryReady;
   galleryReady = (async () => {
     const [{ createGallery }] = await Promise.all([
-      import('./gallery.js?v=1794995220'),
-      ...['500 46px "Cinzel"', '500 16px "Garet"'].map((f) => document.fonts.load(f)),
+      import('./gallery.js?v=1795001914'),
+      ...['500 46px "Cinzel"', '500 16px "Garet"', '34px "Garet"'].map((f) => document.fonts.load(f)),
     ]);
     const hasRecap = await fetch('assets/recap/recap.mp4', { method: 'HEAD' }).then((r) => r.ok).catch(() => false);   // the cinema plays the recap film once it exists
     const hud = $('#hud');
